@@ -2,55 +2,22 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, TextInput, View, Image, TouchableOpacity,Text,FlatList} from 'react-native';
 import React, { useState } from 'react';
 import Table from './components/Table';
-
+import Login from './components/Login';
+import Profile from './components/Profile';
+import Dashboard from './components/Dashboard';
+import { NavigationContainer } from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
 
 export default function App() {
-  const [searchval, setSearchVal] = useState("");
-  
-  const data = [{id:1,title:"Hello"},
-    {id:2,title:"World"},
-    {id:3,title:"Web"},
-    {id:4,title:"Web"},
-    {id:5,title:"Web"},
-    {id:6,title:"Web"},
-    {id:7,title:"Web"},
-    {id:8,title:"Web"},
-    {id:9,title:"Web"},
-    {id:10,title:"Web"},
-    {id:11,title:"Web"},
-    {id:12,title:"Web"},  
-    {id:13,title:"Web"},  
-    {id:14,title:"Web"},  
-    {id:15,title:"Web"},  
-    {id:16,title:"Web"},  
-  ]
-
+  const Stack = createNativeStackNavigator();
   return (
-    <View style={styles.container}>
-      
-      {/* <Image 
-        style={styles.imagesize} 
-        source={require('./assets/google-logo.webp')} 
-      />
-      <View style={{flexDirection:'row'}}>
-
-      <TextInput 
-        style={styles.textinput} 
-        value={searchval} 
-        onChangeText={setSearchVal}
-        placeholder="Search..."
-        />
-
-      <TouchableOpacity style={styles.buttonstyle} onPress={()=>{setSearchVal('')}}>
-        <Text>Search</Text>
-      </TouchableOpacity>
-
-      </View> */}
-      <View style={{ flex: 1,alignContent:'center',width:'100%'}}>
-        <Table data={data} />
-      </View>
-      <StatusBar style="auto" />
-    </View>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Login" component={Login}/>
+          <Stack.Screen name="Profile" component={Profile} />   
+          <Stack.Screen name="Dashboard" component={Dashboard}/>
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 }
 
@@ -58,9 +25,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,  
     backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'flex-start',
-    paddingTop: 60
+    paddingTop: 40
   },
   textinput: {
     height: 40,
@@ -89,3 +56,5 @@ buttonText: {
   fontSize: 14
 }
 });
+
+
