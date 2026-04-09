@@ -7,17 +7,16 @@ import Profile from './components/Profile';
 import Dashboard from './components/Dashboard';
 import { NavigationContainer } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 export default function App() {
-  const Stack = createNativeStackNavigator();
+  const BottomTabs = createBottomTabNavigator();
   return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Login" component={Login}/>
-          <Stack.Screen name="Profile" component={Profile} />   
-          <Stack.Screen name="Dashboard" component={Dashboard}/>
-        </Stack.Navigator>
-      </NavigationContainer>
+        <BottomTabs.Navigator>
+          <BottomTabs.Screen name="Login" component={Login}/>
+          <BottomTabs.Screen name="Profile" component={Profile} />   
+          <BottomTabs.Screen name="Dashboard" component={Dashboard}/>
+        </BottomTabs.Navigator>
   );
 }
 
