@@ -1,22 +1,74 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, TextInput, View, Image, TouchableOpacity,Text,FlatList} from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, TextInput, View, Image, TouchableOpacity, Text, FlatList } from 'react-native';
+import React from 'react';
 import Table from './components/Table';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import Dashboard from './components/Dashboard';
 import { NavigationContainer } from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+
+const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
+
+// Stack Navigator for Auth Screens
+function AuthStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen
+        name="LoginScreen"
+        component={Login}
+        options={{ title: 'Login' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Drawer Navigator with nested Stack
+function DrawerNavigator() {
+  return (
+    <Drawer.Navigator
+    >
+      <Drawer.Screen
+        name="Dashboard"
+        component={Dashboard}
+      />
+      <Drawer.Screen
+        name="Profile"
+        component={Profile}
+      />
+      <Drawer.Screen
+        name="Table"
+        component={Table}
+      />
+    </Drawer.Navigator>
+  );
+}
 
 export default function App() {
-  const BottomTabs = createBottomTabNavigator();
   return (
-        <BottomTabs.Navigator>
-          <BottomTabs.Screen name="Login" component={Login}/>
-          <BottomTabs.Screen name="Profile" component={Profile} />   
-          <BottomTabs.Screen name="Dashboard" component={Dashboard}/>
-        </BottomTabs.Navigator>
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+        initialRouteName="Login"
+      >
+        <Stack.Screen
+          name="Login"
+          component={Login}
+        />
+        <Stack.Screen
+          name="App"
+          component={DrawerNavigator}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

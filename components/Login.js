@@ -22,7 +22,10 @@ export default function Login({navigation}) {
         console.log(res.data);
 
         if (res.status === 200) {
-            navigation.navigate('Dashboard');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'App' }],
+            });
         }
 
     } catch (err) {
