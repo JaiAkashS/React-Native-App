@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity,Image } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {pickImage} from '../services/ImageUpload'
@@ -8,19 +8,26 @@ export default function Profile({navigation}) {
     const [image,setImage] = useState(null)
     const [iseditable,setEditable] = useState(false)
     const [userdata,setUserData] = useState({email:'john@example.com',phone:'9175215412',location:"Chennai, Tambarm",experience:'2'})
+
     useEffect(()=>{
         const getData = async()=>{
-        const data = await AsyncStorage.getItem('token');
+            const data = await AsyncStorage.getItem('userAvatar');
             if(data !== null){
                 setImage(data)
             }
         }
-        getData()
+        getData();
     },[])
+    
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <TouchableOpacity onPress={pickImage}>
+                <TouchableOpacity onPress={async ()=>{
+                    await pickImage();
+                    const savedImage = await AsyncStorage.getItem('userAvatar');
+                    if (savedImage) setImage(savedImage);
+                    }}>
+                        
                     {image ? (
                         <Image source={{ uri: image }} style={styles.avatar} />
                     ) : (

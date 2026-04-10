@@ -5,6 +5,7 @@ import React from 'react';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import Dashboard from './components/Dashboard';
+import Search from './components/Search';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -40,7 +41,10 @@ function DrawerNavigator() {
         name="Dashboard"
         component={Dashboard}
       />
-      
+      <Drawer.Screen
+        name="Search"
+        component={Search}
+      />
     </Drawer.Navigator>
   );
 }

@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect,useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View,Image } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
 export default function Dashboard({navigation}) {
+    const [image,setImage] = useState(null)
+    
     const jobs = [
     {id:1, jobtitle:"Frontend Developer", date:'13-01-2026'},
     {id:2, jobtitle:"React Native Specialist", date:'14-01-2026'},
@@ -31,23 +33,29 @@ export default function Dashboard({navigation}) {
     {id:24, jobtitle:"Blockchain Developer", date:'04-02-2026'},
     {id:25, jobtitle:"Embedded Systems Engineer", date:'05-02-2026'}
 ];
-    useEffect(()=>{
-        const getData = async()=>{
-        const data = await AsyncStorage.getItem('token');
-            if(data !== null){
-                console.log(data)
-            }
+    useEffect(() => {
+        const getData = async () => {
+        const data = await AsyncStorage.getItem('userAvatar');
+        if (data !== null) {
+            setImage(data);
         }
-        getData()
-    },[])
+        };
+        getData();
+    }, []);  
+
+
     return (
         <View style={styles.container}>
             <View style={{flexDirection:'row' , justifyContent:'space-between'}}>
                 <Text style={styles.title}>Job Portal Dashboard</Text>
                 <TouchableOpacity onPress={()=>navigation.navigate("Profile")}>
-                    <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>JD</Text>
-                    </View>
+                    {image ? (
+                                            <Image source={{ uri: image }} style={styles.avatar} />
+                                        ) : (
+                                            <View style={styles.avatar}>
+                                            <Text style={styles.avatarText}>JD</Text>
+                                            </View>
+                                        )}
                 </TouchableOpacity>
             </View>
             {/* <Text style={styles.subtitle}>Welcome back, Candidate</Text> */}
