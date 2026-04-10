@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, TextInput, View, Image, TouchableOpacity, Text, FlatList } from 'react-native';
 import React from 'react';
-import Table from './components/Table';
+// import Table from './components/Table';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import Dashboard from './components/Dashboard';
@@ -12,7 +12,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-// Stack Navigator for Auth Screens
 function AuthStack() {
   return (
     <Stack.Navigator
@@ -29,7 +28,6 @@ function AuthStack() {
   );
 }
 
-// Drawer Navigator with nested Stack
 function DrawerNavigator() {
   return (
     <Drawer.Navigator
@@ -41,10 +39,6 @@ function DrawerNavigator() {
       <Drawer.Screen
         name="Profile"
         component={Profile}
-      />
-      <Drawer.Screen
-        name="Table"
-        component={Table}
       />
     </Drawer.Navigator>
   );

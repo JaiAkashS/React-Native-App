@@ -8,7 +8,7 @@ export default function Dashboard({navigation}) {
                 <Text style={styles.title}>Job Portal Dashboard</Text>
                 <TouchableOpacity onPress={()=>navigation.navigate("Profile")}>
                     <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>TK</Text>
+                    <Text style={styles.avatarText}>JD  </Text>
                     </View>
                 </TouchableOpacity>
             </View>

@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 
 export default function Profile() {
     return (
         <View style={styles.container}>
             <View style={styles.card}>
                 <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>TK</Text>
+                    <Text style={styles.avatarText}>JD</Text>
                 </View>
 
                 <Text style={styles.name}>John Doe</Text>
@@ -14,7 +15,7 @@ export default function Profile() {
 
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Email</Text>
-                    <Text style={styles.infoValue}>john@example.com</Text>
+                    <Text style={styles.infoValue}>john@example.com</Text>  
                 </View>
 
                 <View style={styles.infoRow}>
@@ -31,11 +32,14 @@ export default function Profile() {
                     <Text style={styles.infoLabel}>Experience</Text>
                     <Text style={styles.infoValue}>2 Years</Text>
                 </View>
-
-                <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
-                    <Text style={styles.editButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
-                
+                <View style={{flexDirection:'row'}}>
+                    <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
+                        <Text style={styles.editButtonText}>Edit Profile</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.editButton,styles.logoutbutton]} activeOpacity={0.8} onPress={()=>{navigation.navigate('Login')}}>
+                        <Text style={[styles.editButtonText,{color:'red'}]}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -101,7 +105,8 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     editButton: {
-        marginTop: 6,
+        flex:1,
+        margin: 6,
         backgroundColor: '#1C7ED6',
         borderRadius: 10,
         paddingVertical: 11,
@@ -112,4 +117,9 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 14,
     },
+    logoutbutton:{
+        backgroundColor:'white' , 
+        borderWidth:1,
+        borderColor:'red'
+    }
 });
