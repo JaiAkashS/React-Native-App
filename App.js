@@ -33,13 +33,14 @@ function DrawerNavigator() {
     <Drawer.Navigator
     >
       <Drawer.Screen
-        name="Dashboard"
-        component={Dashboard}
-      />
-      <Drawer.Screen
         name="Profile"
         component={Profile}
       />
+      <Drawer.Screen
+        name="Dashboard"
+        component={Dashboard}
+      />
+      
     </Drawer.Navigator>
   );
 }

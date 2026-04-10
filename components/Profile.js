@@ -1,45 +1,97 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {pickImage} from '../services/ImageUpload'
 
-export default function Profile() {
+export default function Profile({navigation}) {
+    const [image,setImage] = useState(null)
+    const [iseditable,setEditable] = useState(false)
+    const [userdata,setUserData] = useState({email:'john@example.com',phone:'9175215412',location:"Chennai, Tambarm",experience:'2'})
+    useEffect(()=>{
+        const getData = async()=>{
+        const data = await AsyncStorage.getItem('token');
+            if(data !== null){
+                setImage(data)
+            }
+        }
+        getData()
+    },[])
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>JD</Text>
-                </View>
+                <TouchableOpacity onPress={pickImage}>
+                    {image ? (
+                        <Image source={{ uri: image }} style={styles.avatar} />
+                    ) : (
+                        <View style={styles.avatar}>
+                        <Text style={styles.avatarText}>JD</Text>
+                        </View>
+                    )}
+                </TouchableOpacity>
 
                 <Text style={styles.name}>John Doe</Text>
                 <Text style={styles.role}>React Native Developer</Text>
 
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Email</Text>
-                    <Text style={styles.infoValue}>john@example.com</Text>  
-                </View>
+                {!iseditable && (
+                    <View>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Email</Text>
+                            <Text style={styles.infoValue}>{userdata.email}</Text>  
+                        </View>
 
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Phone</Text>
-                    <Text style={styles.infoValue}>+91 98765 43210</Text>
-                </View>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Phone</Text>
+                            <Text style={[styles.infoValue]}>{userdata.phone}</Text>
+                        </View>
 
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Location</Text>
-                    <Text style={styles.infoValue}>Chennai, India</Text>
-                </View>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Location</Text>
+                            <Text style={styles.infoValue}>{userdata.location}</Text>
+                        </View>
 
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Experience</Text>
-                    <Text style={styles.infoValue}>2 Years</Text>
-                </View>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Experience</Text>
+                            <Text style={styles.infoValue}>{`${userdata.experience} Years`}</Text>
+                        </View>
+                </View>)}
+
+                {iseditable && (
+                    <View>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Email</Text>
+                            <TextInput style={[styles.infoValue]} value={userdata.email} onChangeText={(text)=>{setUserData({...userdata,'email':text})}}/>                              
+                        </View>
+
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Phone</Text>
+                            <TextInput style={[styles.infoValue ]} value={userdata.phone} onChangeText={(text)=>{setUserData({...userdata,'phone':text})}}/> 
+                        </View>
+
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Location</Text>
+                            <TextInput style={[styles.infoValue ]} value={userdata.location} onChangeText={(text)=>{setUserData({...userdata,'location':text})}}/> 
+                        </View>
+
+                        <View style={styles.infoRow}>
+                            <Text style={styles.infoLabel}>Experience</Text>
+                            <TextInput style={[styles.infoValue ]} value={userdata.experience} onChangeText={(text)=>{setUserData({...userdata,'experience':text})}}/> 
+                        </View>
+                </View>)}
+
+
                 <View style={{flexDirection:'row'}}>
-                    <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
+
+                    <TouchableOpacity style={styles.editButton} activeOpacity={0.8} onPress={()=>{setEditable(prev => !prev)}}>
                         <Text style={styles.editButtonText}>Edit Profile</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.editButton,styles.logoutbutton]} activeOpacity={0.8} onPress={()=>{navigation.navigate('Login')}}>
                         <Text style={[styles.editButtonText,{color:'red'}]}>Logout</Text>
                     </TouchableOpacity>
+                
                 </View>
+
+
             </View>
         </View>
     );

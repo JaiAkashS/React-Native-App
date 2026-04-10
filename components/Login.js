@@ -1,9 +1,13 @@
 import { StyleSheet, TextInput, View, TouchableOpacity, Text, Alert, Platform} from 'react-native';
 import React, { useState } from 'react';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login({navigation}) {
     const [user, setUser] = useState({email:'',password:''});
+    const saveId = async(token)=>{
+        await AsyncStorage.setItem('token',token);
+    }
     const handlelogin = async () => {
     try {
         const res = await axios.post(
@@ -22,6 +26,8 @@ export default function Login({navigation}) {
         console.log(res.data);
 
         if (res.status === 200) {
+            
+            await saveId(res.data.token)
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'App' }],
