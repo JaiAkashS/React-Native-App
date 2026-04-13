@@ -119,44 +119,39 @@ export default function Dashboard() {
           data={jobsdata.filter((item) =>
             item.title.toLowerCase().includes(searchValue.toLowerCase()),
           )}
+          contentContainerStyle={styles.listContent}
           renderItem={({ item }) => {
             const isApplied = appliedJobKeys.includes(getJobKey(item));
 
             return (
-              <View
-                style={[
-                  styles.jobCard,
-                  { flexDirection: "row", justifyContent: "space-between" },
-                ]}
-              >
-                <View style={{ flex: 2, justifyContent: "space-between" }}>
-                  <Text style={styles.jobTitle}>{item.title}</Text>
-                  <Text style={styles.company}>{item.owner.companyName}</Text>
-                  <Text
-                    style={styles.jobMeta}
-                  >{`Created At ${item.createdAt}`}</Text>
-                </View>
-                <View style={{ flex: 1, justifyContent: "space-evenly" }}>
-                  <Text
-                    style={[
-                      styles.jobMeta,
-                      { color: "green", fontWeight: "bold" },
-                    ]}
-                  >{`₹${item.descriptionBreakdown.salaryRangeMinYearly} - ₹${item.descriptionBreakdown.salaryRangeMaxYearly}`}</Text>
-                  <TouchableOpacity
-                    onPress={async () => {
-                      await handleApply(item);
-                    }}
-                    disabled={isApplied}
-                    style={[
-                      styles.applyButton,
-                      isApplied && styles.applyButtonDisabled,
-                    ]}
-                  >
-                    <Text style={styles.applyButtonText}>
-                      {isApplied ? "Applied" : "Apply"}
-                    </Text>
-                  </TouchableOpacity>
+              <View style={styles.jobCard}>
+                <View style={styles.cardRow}>
+                  <View style={styles.leftColumn}>
+                    <Text style={styles.jobTitle}>{item.title}</Text>
+                    <Text style={styles.company}>{item.owner.companyName}</Text>
+                    <Text
+                      style={styles.jobMeta}
+                    >{`Created At ${item.createdAt}`}</Text>
+                  </View>
+                  <View style={styles.rightColumn}>
+                    <Text
+                      style={styles.salaryText}
+                    >{`₹${item.descriptionBreakdown.salaryRangeMinYearly} - ₹${item.descriptionBreakdown.salaryRangeMaxYearly}`}</Text>
+                    <TouchableOpacity
+                      onPress={async () => {
+                        await handleApply(item);
+                      }}
+                      disabled={isApplied}
+                      style={[
+                        styles.applyButton,
+                        isApplied && styles.applyButtonDisabled,
+                      ]}
+                    >
+                      <Text style={styles.applyButtonText}>
+                        {isApplied ? "Applied" : "Apply"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             );
@@ -168,6 +163,9 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
+  listContent: {
+    paddingBottom: 20,
+  },
   textinput: {
     height: 40,
     borderRadius: 20,
@@ -186,6 +184,24 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginHorizontal: 10,
   },
+  cardRow: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+    columnGap: 12,
+  },
+  leftColumn: {
+    flex: 1,
+    minWidth: 0,
+  },
+  rightColumn: {
+    width: 150,
+    marginLeft: "auto",
+    alignItems: "flex-end",
+    justifyContent: "flex-start",
+    rowGap: 10,
+  },
   jobTitle: {
     fontSize: 15,
     fontWeight: "700",
@@ -202,14 +218,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#2a7dd6",
   },
+  salaryText: {
+    color: "green",
+    fontWeight: "bold",
+    fontSize: 13,
+    textAlign: "right",
+  },
   applyButton: {
-    flex: 1,
-    margin: 6,
     backgroundColor: "#1C7ED6",
     borderRadius: 10,
+    minHeight: 40,
+    minWidth: 110,
+    paddingHorizontal: 12,
     paddingVertical: 11,
     alignItems: "center",
-    maxHeight: 40,
+    justifyContent: "center",
   },
   applyButtonDisabled: {
     backgroundColor: "#A0A8B3",

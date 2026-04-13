@@ -46,24 +46,22 @@ export default function AppliedJobs({ navigation }) {
       <Text style={styles.sectionTitle}>Applied Jobs</Text>
       <FlatList
         data={jobs}
+        contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          <View
-            style={[
-              styles.jobCard,
-              { flexDirection: "row", justifyContent: "space-between" },
-            ]}
-          >
-            <View style={{ flex: 2, justifyContent: "space-between" }}>
-              <Text style={styles.jobTitle}>{item.title}</Text>
-              <Text style={styles.company}>{item.owner.companyName}</Text>
-              <Text
-                style={styles.jobMeta}
-              >{`Created At ${item.createdAt}`}</Text>
-            </View>
-            <View style={{ flex: 1, justifyContent: "space-evenly" }}>
-              <Text
-                style={[styles.jobMeta, { color: "green", fontWeight: "bold" }]}
-              >{`₹${item.descriptionBreakdown.salaryRangeMinYearly} - ₹${item.descriptionBreakdown.salaryRangeMaxYearly}`}</Text>
+          <View style={styles.jobCard}>
+            <View style={styles.cardRow}>
+              <View style={styles.leftColumn}>
+                <Text style={styles.jobTitle}>{item.title}</Text>
+                <Text style={styles.company}>{item.owner.companyName}</Text>
+                <Text
+                  style={styles.jobMeta}
+                >{`Created At ${item.createdAt}`}</Text>
+              </View>
+              <View style={styles.rightColumn}>
+                <Text
+                  style={styles.salaryText}
+                >{`₹${item.descriptionBreakdown.salaryRangeMinYearly} - ₹${item.descriptionBreakdown.salaryRangeMaxYearly}`}</Text>
+              </View>
             </View>
           </View>
         )}
@@ -73,6 +71,9 @@ export default function AppliedJobs({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  listContent: {
+    paddingBottom: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",
@@ -128,6 +129,24 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 14,
     marginBottom: 10,
+    marginHorizontal: 10,
+  },
+  cardRow: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+    columnGap: 12,
+  },
+  leftColumn: {
+    flex: 1,
+    minWidth: 0,
+  },
+  rightColumn: {
+    width: 150,
+    marginLeft: "auto",
+    alignItems: "flex-end",
+    justifyContent: "flex-start",
   },
   jobTitle: {
     fontSize: 15,
@@ -144,6 +163,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 15,
     color: "#2a7dd6",
+  },
+  salaryText: {
+    color: "green",
+    fontWeight: "bold",
+    fontSize: 13,
+    textAlign: "right",
   },
   avatar: {
     width: 60,
