@@ -1,17 +1,17 @@
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  FlatList,
-  Text,
-  ActivityIndicator,
-  TouchableOpacity,
-  Alert,
-  Platform,
-} from "react-native";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
@@ -121,10 +121,27 @@ export default function Dashboard() {
             item.title.toLowerCase().includes(searchValue.toLowerCase()),
           )}
           contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>
+                {searchValue.trim()
+                  ? "No jobs found"
+                  : "No jobs available right now"}
+              </Text>
+              <Text style={styles.emptyText}>
+                {searchValue.trim()
+                  ? "Try a different role, skill, or company name."
+                  : "Check back soon or refresh when new jobs are posted."}
+              </Text>
+            </View>
+          }
           renderItem={({ item }) => {
             const itemKey = getJobKey(item);
             const isApplied = appliedJobKeys.includes(itemKey);
             const isExtended = extendedKeys.includes(itemKey);
+            const employmentType = item.descriptionBreakdown?.employmentType;
+            const workModel = item.descriptionBreakdown?.workModel;
+            const locationAddress = item.locationAddress?.trim();
             return (
               <View style={styles.jobCard}>
                 <View style={styles.cardRow}>
@@ -173,9 +190,28 @@ export default function Dashboard() {
                     <Text style={styles.extendedSummaryText}>
                       {item.descriptionBreakdown?.oneSentenceJobSummary}
                     </Text>
-                    <Text style={styles.extendedTypeText}>
-                      {item.descriptionBreakdown?.employmentType}
-                    </Text>
+                    <View style={styles.badgeRow}>
+                      {employmentType ? (
+                        <View style={styles.infoBadge}>
+                          <Text style={styles.infoBadgeLabel}>Type</Text>
+                          <Text style={styles.infoBadgeValue}>
+                            {employmentType}
+                          </Text>
+                        </View>
+                      ) : null}
+                      {workModel ? (
+                        <View style={styles.infoBadge}>
+                          <Text style={styles.infoBadgeLabel}>Work model</Text>
+                          <Text style={styles.infoBadgeValue}>{workModel}</Text>
+                        </View>
+                      ) : null}
+                    </View>
+                    <View style={styles.locationBlock}>
+                      <Text style={styles.locationLabel}>Location</Text>
+                      <Text style={styles.locationText}>
+                        {locationAddress || "Location not specified"}
+                      </Text>
+                    </View>
                   </View>
                 ) : null}
               </View>
@@ -190,6 +226,27 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 20,
+  },
+  emptyState: {
+    flex: 1,
+    minHeight: 260,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 40,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#102133",
+    textAlign: "center",
+  },
+  emptyText: {
+    marginTop: 8,
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#5A6B7D",
+    textAlign: "center",
   },
   textinput: {
     height: 40,
@@ -279,18 +336,61 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D7E3F2",
     padding: 10,
-    rowGap: 4,
+    rowGap: 10,
   },
   extendedSummaryText: {
     color: "#21374D",
-    fontSize: 12,
-    lineHeight: 18,
+    fontSize: 13,
+    lineHeight: 19,
     textAlign: "left",
   },
-  extendedTypeText: {
-    color: "#0D5C2E",
-    fontSize: 12,
+  badgeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  infoBadge: {
+    minWidth: 112,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#D7E3F2",
+  },
+  infoBadgeLabel: {
+    fontSize: 11,
     fontWeight: "700",
-    textAlign: "left",
+    color: "#5A6B7D",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  infoBadgeValue: {
+    marginTop: 3,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0D5C2E",
+  },
+  locationBlock: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#D7E3F2",
+  },
+  locationLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#5A6B7D",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    marginBottom: 4,
+  },
+  locationText: {
+    color: "#21374D",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
   },
 });

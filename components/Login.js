@@ -1,18 +1,19 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useState } from "react";
 import {
-  StyleSheet,
-  TextInput,
-  View,
-  TouchableOpacity,
-  Text,
   Alert,
   Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useState } from "react";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login({ navigation }) {
   const [user, setUser] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const saveId = async (token) => {
     await AsyncStorage.setItem("token", token);
   };
@@ -74,16 +75,27 @@ export default function Login({ navigation }) {
 
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            placeholder="Enter your password"
-            value={user.password}
-            onChangeText={(text) => {
-              setUser({ ...user, password: text });
-            }}
-            placeholderTextColor="#8A97A8"
-            secureTextEntry
-            style={styles.input}
-          />
+          <View style={styles.passwordRow}>
+            <TextInput
+              placeholder="Enter your password"
+              value={user.password}
+              onChangeText={(text) => {
+                setUser({ ...user, password: text });
+              }}
+              placeholderTextColor="#8A97A8"
+              secureTextEntry={!showPassword}
+              style={styles.passwordInput}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.eyeButton}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+            >
+              <Text style={styles.eyeText}>{showPassword ? "Hide" : "Show"}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <TouchableOpacity
@@ -149,6 +161,36 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#132235",
     backgroundColor: "#FFFFFF",
+  },
+  passwordRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#D5DDE7",
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    overflow: "hidden",
+  },
+  passwordInput: {
+    flex: 1,
+    height: 44,
+    paddingHorizontal: 12,
+    fontSize: 15,
+    color: "#132235",
+  },
+  eyeButton: {
+    height: 44,
+    paddingHorizontal: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    borderLeftWidth: 1,
+    borderLeftColor: "#D5DDE7",
+    backgroundColor: "#F8FAFC",
+  },
+  eyeText: {
+    color: "#1C7ED6",
+    fontSize: 13,
+    fontWeight: "700",
   },
   primaryButton: {
     height: 46,

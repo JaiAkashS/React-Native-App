@@ -1,14 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
 import {
+  FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Image,
-  FlatList,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 
 export default function AppliedJobs({ navigation }) {
   const [image, setImage] = useState(null);
@@ -41,12 +41,18 @@ export default function AppliedJobs({ navigation }) {
           )}
         </TouchableOpacity>
       </View>
-      {/* <Text style={styles.subtitle}>Welcome back, Candidate</Text> */}
 
-      {/* <Text style={styles.sectionTitle}>Applied Jobs</Text> */}
       <FlatList
         data={jobs}
         contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>No jobs applied yet</Text>
+            <Text style={styles.emptyText}>
+              Jobs you apply to will appear here so you can track them later.
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <View style={styles.jobCard}>
             <View style={styles.cardRow}>
@@ -73,6 +79,27 @@ export default function AppliedJobs({ navigation }) {
 const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 20,
+  },
+  emptyState: {
+    flex: 1,
+    minHeight: 260,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 40,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#102133",
+    textAlign: "center",
+  },
+  emptyText: {
+    marginTop: 8,
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#5A6B7D",
+    textAlign: "center",
   },
   container: {
     flex: 1,
