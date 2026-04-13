@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [searchValue, setSearchValue] = useState("");
   const [jobsdata, setJobsData] = useState([]);
   const [appliedJobKeys, setAppliedJobKeys] = useState([]);
+  const [extendedKeys, setExtendedKeys] = useState([]);
 
   const getJobKey = (job) => {
     if (job?.id != null) return `id:${job.id}`;
@@ -73,7 +74,7 @@ export default function Dashboard() {
           "https://api.joinrise.io/api/v1/jobs/public?page=1&limit=40&sort=asc&sortedBy=createdAt&includeDescription=true&isTrending=true",
         );
 
-        console.log(res.data.result.jobs);
+        // console.log(res.data.result.jobs);
         let jobs = res.data.result.jobs;
         jobs = jobs.map((item) => {
           return {
@@ -121,8 +122,9 @@ export default function Dashboard() {
           )}
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => {
-            const isApplied = appliedJobKeys.includes(getJobKey(item));
-
+            const itemKey = getJobKey(item);
+            const isApplied = appliedJobKeys.includes(itemKey);
+            const isExtended = extendedKeys.includes(itemKey);
             return (
               <View style={styles.jobCard}>
                 <View style={styles.cardRow}>
@@ -151,8 +153,31 @@ export default function Dashboard() {
                         {isApplied ? "Applied" : "Apply"}
                       </Text>
                     </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setExtendedKeys((prev) => {
+                          return prev.includes(itemKey)
+                            ? prev.filter((val) => val !== itemKey)
+                            : prev.concat(itemKey);
+                        });
+                      }}
+                    >
+                      <Text style={styles.toggleText}>
+                        {isExtended ? "Show less" : "Show more"}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
+                {isExtended ? (
+                  <View style={styles.extendedContainer}>
+                    <Text style={styles.extendedSummaryText}>
+                      {item.descriptionBreakdown?.oneSentenceJobSummary}
+                    </Text>
+                    <Text style={styles.extendedTypeText}>
+                      {item.descriptionBreakdown?.employmentType}
+                    </Text>
+                  </View>
+                ) : null}
               </View>
             );
           }}
@@ -241,5 +266,31 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "700",
     fontSize: 14,
+  },
+  toggleText: {
+    color: "#1C7ED6",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  extendedContainer: {
+    marginTop: 12,
+    borderRadius: 8,
+    backgroundColor: "#F4F8FC",
+    borderWidth: 1,
+    borderColor: "#D7E3F2",
+    padding: 10,
+    rowGap: 4,
+  },
+  extendedSummaryText: {
+    color: "#21374D",
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: "left",
+  },
+  extendedTypeText: {
+    color: "#0D5C2E",
+    fontSize: 12,
+    fontWeight: "700",
+    textAlign: "left",
   },
 });

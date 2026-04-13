@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Linking,
+  Platform,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { pickImage } from "../services/ImageUpload";
+import { uploadPDF } from "../services/ResumeUpload";
 
 export default function Profile({ navigation }) {
   const [image, setImage] = useState(null);
+  const [resume, setResume] = useState(null);
+  const [resumeUploadStatus, setResumeUploadStatus] = useState("");
   const [iseditable, setEditable] = useState(false);
   const [userdata, setUserData] = useState({
     email: "john@example.com",
@@ -16,13 +28,48 @@ export default function Profile({ navigation }) {
 
   useEffect(() => {
     const getData = async () => {
-      const data = await AsyncStorage.getItem("userAvatar");
-      if (data !== null) {
-        setImage(data);
+      const avatar = await AsyncStorage.getItem("userAvatar");
+      const savedResume = await AsyncStorage.getItem("resume");
+
+      if (avatar !== null) {
+        setImage(avatar);
+      }
+
+      if (savedResume !== null) {
+        setResume(savedResume);
       }
     };
     getData();
   }, []);
+
+  const openResumeLink = async () => {
+    if (!resume) return;
+
+    try {
+      if (Platform.OS === "web") {
+        const opened = window.open(resume, "_blank", "noopener,noreferrer");
+        if (!opened) {
+          window.location.assign(resume);
+        }
+        return;
+      }
+
+      const canOpen = await Linking.canOpenURL(resume);
+      if (!canOpen) {
+        Alert.alert("Error", "Cannot open resume link");
+        return;
+      }
+
+      await Linking.openURL(resume);
+    } catch (error) {
+      console.log(error);
+      if (Platform.OS === "web") {
+        setResumeUploadStatus("Could not open resume. Try again.");
+      } else {
+        Alert.alert("Error", "Failed to open resume");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -141,6 +188,45 @@ export default function Profile({ navigation }) {
             </Text>
           </TouchableOpacity>
         </View>
+        <View>
+          <TouchableOpacity
+            onPress={async () => {
+              setResumeUploadStatus("");
+              const result = await uploadPDF();
+              if (result.url) {
+                setResume(result.url);
+                setResumeUploadStatus("Resume uploaded successfully");
+              } else {
+                setResumeUploadStatus(
+                  result.error || "Resume upload failed. Try again.",
+                );
+              }
+            }}
+          >
+            <Text style={styles.resumeUploadText}>
+              Upload Resume in PDF Format
+            </Text>
+          </TouchableOpacity>
+          {resumeUploadStatus ? (
+            <Text
+              style={[
+                styles.resumeStatusText,
+                resumeUploadStatus.includes("successfully")
+                  ? styles.resumeStatusSuccess
+                  : styles.resumeStatusError,
+              ]}
+            >
+              {resumeUploadStatus}
+            </Text>
+          ) : null}
+          {resume ? (
+            <TouchableOpacity onPress={openResumeLink}>
+              <Text numberOfLines={1} style={styles.resumeLinkText}>
+                View uploaded resume
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
     </View>
   );
@@ -222,5 +308,29 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderWidth: 1,
     borderColor: "red",
+  },
+  resumeUploadText: {
+    marginTop: 10,
+    color: "#1C7ED6",
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  resumeLinkText: {
+    marginTop: 8,
+    color: "#0D5C2E",
+    textDecorationLine: "underline",
+    textAlign: "center",
+    fontWeight: "700",
+  },
+  resumeStatusText: {
+    marginTop: 8,
+    textAlign: "center",
+    fontWeight: "600",
+  },
+  resumeStatusSuccess: {
+    color: "#167A3E",
+  },
+  resumeStatusError: {
+    color: "#C92A2A",
   },
 });

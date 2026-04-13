@@ -43,7 +43,7 @@ export default function AppliedJobs({ navigation }) {
       </View>
       {/* <Text style={styles.subtitle}>Welcome back, Candidate</Text> */}
 
-      <Text style={styles.sectionTitle}>Applied Jobs</Text>
+      {/* <Text style={styles.sectionTitle}>Applied Jobs</Text> */}
       <FlatList
         data={jobs}
         contentContainerStyle={styles.listContent}

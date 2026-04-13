@@ -77,7 +77,7 @@ const uploadToCloudinary = async (imageUri) => {
   } catch (err) {
     console.error("Upload error:", err);
     alert("Failed to upload image");
-  }
+  }``
 };
 
 module.exports = { pickImage, uploadToCloudinary };
