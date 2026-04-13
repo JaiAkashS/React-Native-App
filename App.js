@@ -9,11 +9,10 @@ import {
   FlatList,
 } from "react-native";
 import React from "react";
-// import Table from './components/Table';
 import Login from "./components/Login";
 import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
-import Search from "./components/Search";
+import AppliedJobs from "./components/AppliedJobs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -40,9 +39,10 @@ function AuthStack() {
 function DrawerNavigator() {
   return (
     <Drawer.Navigator>
-      <Drawer.Screen name="Profile" component={Profile} />
       <Drawer.Screen name="Dashboard" component={Dashboard} />
-      <Drawer.Screen name="Search" component={Search} />
+      <Drawer.Screen name="Profile" component={Profile} />
+      <Drawer.Screen name="AppliedJobs" component={AppliedJobs} />
+      {/* <Drawer.Screen name="Search" component={Search} /> */}
     </Drawer.Navigator>
   );
 }

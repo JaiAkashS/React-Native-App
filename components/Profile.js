@@ -29,9 +29,8 @@ export default function Profile({ navigation }) {
       <View style={styles.card}>
         <TouchableOpacity
           onPress={async () => {
-            await pickImage();
-            const savedImage = await AsyncStorage.getItem("userAvatar");
-            if (savedImage) setImage(savedImage);
+            const uploadedUrl = await pickImage();
+            if (uploadedUrl) setImage(uploadedUrl);
           }}
         >
           {image ? (

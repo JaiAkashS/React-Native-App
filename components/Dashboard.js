@@ -1,109 +1,181 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
-  Text,
-  TouchableOpacity,
+  TextInput,
   View,
-  Image,
   FlatList,
+  Text,
+  ActivityIndicator,
+  TouchableOpacity,
+  Alert,
+  Platform,
 } from "react-native";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { jobs } from "../services/seedData";
-import { compatibilityFlags } from "react-native-screens";
+export default function Dashboard() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [jobsdata, setJobsData] = useState([]);
+  const [appliedJobKeys, setAppliedJobKeys] = useState([]);
 
-export default function Dashboard({ navigation }) {
-  const [image, setImage] = useState(null);
+  const getJobKey = (job) => {
+    if (job?.id != null) return `id:${job.id}`;
+    if (job?._id != null) return `_id:${job._id}`;
+    if (job?.uuid) return `uuid:${job.uuid}`;
+
+    const title = (job?.title || "").trim().toLowerCase();
+    const company = (job?.owner?.companyName || "").trim().toLowerCase();
+    return `${title}|${company}`;
+  };
+
+  const handleApply = async (item) => {
+    try {
+      const storedData = await AsyncStorage.getItem("appliedjobs");
+
+      let jobs = storedData ? JSON.parse(storedData) : [];
+      const itemKey = getJobKey(item);
+
+      const alreadyApplied = jobs.some((job) => getJobKey(job) === itemKey);
+
+      if (!alreadyApplied) {
+        jobs.push(item);
+        await AsyncStorage.setItem("appliedjobs", JSON.stringify(jobs));
+        setAppliedJobKeys((prev) =>
+          prev.includes(itemKey) ? prev : [...prev, itemKey],
+        );
+        if (Platform.OS === "web") {
+          alert("Applied Job");
+        } else {
+          Alert.alert("Success", "Applied");
+        }
+      } else if (Platform.OS === "web") {
+        alert("Already applied");
+      } else {
+        Alert.alert("Info", "Already applied");
+      }
+    } catch (error) {
+      console.log(error);
+
+      if (Platform.OS === "web") {
+        alert("Error");
+      } else {
+        Alert.alert("Error", "Application failed");
+      }
+    }
+  };
 
   useEffect(() => {
-    const getData = async () => {
-      const data = await AsyncStorage.getItem("userAvatar");
-      if (data !== null) {
-        setImage(data);
+    const fetchJobs = async () => {
+      try {
+        setIsLoading(true);
+        const res = await axios.get(
+          "https://api.joinrise.io/api/v1/jobs/public?page=1&limit=40&sort=asc&sortedBy=createdAt&includeDescription=true&isTrending=true",
+        );
+
+        console.log(res.data.result.jobs);
+        let jobs = res.data.result.jobs;
+        jobs = jobs.map((item) => {
+          return {
+            ...item,
+            createdAt: new Date(item.createdAt).toLocaleDateString(),
+          };
+        });
+        setJobsData(jobs);
+
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+        console.log(err);
       }
     };
-    getData();
+
+    const loadAppliedJobs = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem("appliedjobs");
+        const jobs = storedData ? JSON.parse(storedData) : [];
+        setAppliedJobKeys(jobs.map((job) => getJobKey(job)));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchJobs();
+    loadAppliedJobs();
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={styles.title}>Job Portal Dashboard</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          {image ? (
-            <Image source={{ uri: image }} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>JD</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-      {/* <Text style={styles.subtitle}>Welcome back, Candidate</Text> */}
-
-      <Text style={styles.sectionTitle}>Applied Jobs</Text>
-      <FlatList
-        data={jobs}
-        renderItem={({ item }) => (
-          <View style={styles.jobCard}>
-            <Text style={styles.jobTitle}>{item.jobtitle}</Text>
-            <Text style={styles.company}>{item.company}</Text>
-            <Text style={styles.jobMeta}>{`Applied on ${item.date}`}</Text>
-          </View>
-        )}
+    <View style={{ flex: 1 }}>
+      <TextInput
+        style={styles.textinput}
+        placeholder="Cloud Engineer"
+        value={searchValue}
+        onChangeText={setSearchValue}
       />
+      {isLoading ? (
+        <ActivityIndicator />
+      ) : (
+        <FlatList
+          data={jobsdata.filter((item) =>
+            item.title.toLowerCase().includes(searchValue.toLowerCase()),
+          )}
+          renderItem={({ item }) => {
+            const isApplied = appliedJobKeys.includes(getJobKey(item));
+
+            return (
+              <View
+                style={[
+                  styles.jobCard,
+                  { flexDirection: "row", justifyContent: "space-between" },
+                ]}
+              >
+                <View style={{ flex: 2, justifyContent: "space-between" }}>
+                  <Text style={styles.jobTitle}>{item.title}</Text>
+                  <Text style={styles.company}>{item.owner.companyName}</Text>
+                  <Text
+                    style={styles.jobMeta}
+                  >{`Created At ${item.createdAt}`}</Text>
+                </View>
+                <View style={{ flex: 1, justifyContent: "space-evenly" }}>
+                  <Text
+                    style={[
+                      styles.jobMeta,
+                      { color: "green", fontWeight: "bold" },
+                    ]}
+                  >{`₹${item.descriptionBreakdown.salaryRangeMinYearly} - ₹${item.descriptionBreakdown.salaryRangeMaxYearly}`}</Text>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await handleApply(item);
+                    }}
+                    disabled={isApplied}
+                    style={[
+                      styles.applyButton,
+                      isApplied && styles.applyButtonDisabled,
+                    ]}
+                  >
+                    <Text style={styles.applyButtonText}>
+                      {isApplied ? "Applied" : "Apply"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          }}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F7FA",
-    paddingHorizontal: 16,
-    paddingTop: 24,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#102133",
-  },
-  subtitle: {
-    marginTop: 4,
-    marginBottom: 16,
-    color: "#5A6B7D",
-    fontSize: 14,
-  },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    borderRadius: 10,
-    paddingVertical: 12,
-    marginHorizontal: 4,
-    alignItems: "center",
-  },
-  statNumber: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1C7ED6",
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "#5A6B7D",
-    marginTop: 2,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#102133",
-    marginBottom: 10,
+  textinput: {
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "dark-grey",
+    margin: 20,
+    padding: 10,
+    color: "grey",
   },
   jobCard: {
     backgroundColor: "#FFFFFF",
@@ -112,6 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 14,
     marginBottom: 10,
+    marginHorizontal: 10,
   },
   jobTitle: {
     fontSize: 15,
@@ -129,18 +202,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#2a7dd6",
   },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#E7F2FE",
-    justifyContent: "center",
+  applyButton: {
+    flex: 1,
+    margin: 6,
+    backgroundColor: "#1C7ED6",
+    borderRadius: 10,
+    paddingVertical: 11,
     alignItems: "center",
-    alignSelf: "center",
+    maxHeight: 40,
   },
-  avatarText: {
-    color: "#1C7ED6",
-    fontSize: 24,
+  applyButtonDisabled: {
+    backgroundColor: "#A0A8B3",
+  },
+  applyButtonText: {
+    color: "#FFFFFF",
     fontWeight: "700",
+    fontSize: 14,
   },
 });
